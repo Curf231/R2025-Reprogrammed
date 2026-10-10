@@ -34,6 +34,7 @@ import frc.robot.Constants.Ports;
 import frc.robot.Constants.SwerveConstants;
 import frc.robot.commands.Autos;
 import frc.robot.generated.TunerConstants;
+import frc.robot.subsystems.Intake;
 import frc.robot.subsystems.Swerve;
 import java.lang.reflect.Field;
 
@@ -57,6 +58,8 @@ public class Robot extends TimedRobot {
   private final NetworkTableInstance _ntInst;
 
   private boolean _fileOnlySet = false;
+
+  private final Intake m_intakeSubsystem = new Intake();
 
   /**
    * This function is run when the robot is first started up and should be used for any
@@ -184,6 +187,10 @@ public class Robot extends TimedRobot {
     _driverController.x().whileTrue(_swerve.brake());
     _driverController.a().onTrue(_swerve.toggleFieldOriented());
     _driverController.y().onTrue(_swerve.resetHeading());
+
+    _driverController
+        .rightTrigger()
+        .whileTrue(m_intakeSubsystem.intakeCommand(((SwerveConstants.driverTranslationalVelocity.in(MetersPerSecond))*((SwerveConstants.driverAngularVelocity.in(RadiansPerSecond)))/(360/Math.PI)) * 2));
   }
 
   /**
