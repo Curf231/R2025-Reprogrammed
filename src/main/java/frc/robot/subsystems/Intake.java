@@ -1,26 +1,30 @@
 package frc.robot.subsystems;
 
+import static edu.wpi.first.units.Units.*;
+
 import com.ctre.phoenix6.SignalLogger;
 import com.ctre.phoenix6.configs.MotionMagicConfigs;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.controls.MotionMagicVelocityVoltage;
 import com.ctre.phoenix6.controls.MotionMagicVoltage;
+import com.ctre.phoenix6.controls.VoltageOut;
 import com.ctre.phoenix6.hardware.TalonFX;
-import com.ctre.phoenix6.mechanisms.SimpleDifferentialMechanism;
-
-import static edu.wpi.first.units.Units.*;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Subsystem;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
-import frc.robot.utils.HolonomicController;
+import frc.robot.Constants;
 
-public class Intake implements Subsystem{
+public class Intake implements Subsystem {
 
-    
-    private final TalonFX intakeMotor = new TalonFX(0);
-    private final MotionMagicVelocityVoltage intakeVoltage = new MotionMagicVelocityVoltage(0);
+  private final TalonFX feedMotor = new TalonFX(Constants.MotorConstants.kfeedMotor);
+  private final TalonFX updownMotor = new TalonFX(Constants.MotorConstants.kupdownMotor);
 
-    private final SysIdRoutine _intakeRoutine =
+  private final MotionMagicVelocityVoltage intakeVoltage = new MotionMagicVelocityVoltage(0);
+  private final MotionMagicVoltage updownVoltage = new MotionMagicVoltage(0);
+
+  private final VoltageOut sysIdVoltage = new VoltageOut(0);
+
+  private final SysIdRoutine _feedRoutine =
       new SysIdRoutine(
           new SysIdRoutine.Config(
               null, // Use default ramp rate (1 V/s)
@@ -29,43 +33,57 @@ public class Intake implements Subsystem{
               // Log state with SignalLogger class
               state -> SignalLogger.writeString("state", state.toString())),
           new SysIdRoutine.Mechanism(
-              output -> setControl(intakeVoltage.withVelocity(output)), null, this));
-      
-    
-    public Intake() {
-        var talonFXConfigs = new TalonFXConfiguration();
-
-        var slot0Configs = talonFXConfigs.Slot0;
-        slot0Configs.kS = 0.14;
-        slot0Configs.kV = 0.939;
-        slot0Configs.kA = 0.002;
-        slot0Configs.kG = 0.435;
-        slot0Configs.kP = 28;
-        slot0Configs.kD = 0.2;
-
-        var motionMagicConfigs = new MotionMagicConfigs();
-        motionMagicConfigs.MotionMagicCruiseVelocity = 80;
-        motionMagicConfigs.MotionMagicAcceleration = 160;
-        motionMagicConfigs.MotionMagicJerk = 1600;
-
-        intakeMotor.getConfigurator().apply(talonFXConfigs);
-    }
-
-    public void intakeSpin(double velocity) {
-        intakeMotor.setControl(intakeVoltage.withVelocity(velocity));
-    }
-
-    public Command intakeCommand(double velocity) {
-        return run(
-            () -> {
-                intakeSpin(velocity);
-            }
+              output -> feedMotor.setControl(sysIdVoltage.withOutput(output.in(Volts))), 
+              null, 
+              this
+            )
         );
+
+    private final SysIdRoutine _updownRoutine =
+      new SysIdRoutine(
+          new SysIdRoutine.Config(
+              null, // Use default ramp rate (1 V/s)
+              Volts.of(4), // Reduce dynamic step voltage to 4 V to prevent brownout
+              null, // Use default timeout (10 s)
+              // Log state with SignalLogger class
+              state -> SignalLogger.writeString("state", state.toString())),
+          new SysIdRoutine.Mechanism(
+              output -> updownMotor.setControl(sysIdVoltage.withOutput(output.in(Volts))), 
+              null, 
+              this
+            )
+        );
+
+  public Intake() {
+
+    feedMotor.getConfigurator().apply(Constants.Gains.kfeedGains);
+    feedMotor.getConfigurator().apply(Constants.Gains.kmotionMagicFeedConfig);
+
+    updownMotor.getConfigurator().apply(Constants.Gains.kupdownGains);
+    updownMotor.getConfigurator().apply(Constants.Gains.kmotionMagicUpdownConfig);
+
+    updownMotor.setPosition(0);
+  }
+
+    public double getUpdownPosition() {
+        return updownMotor.getPosition().getValueAsDouble(); // rotations
     }
 
+    public boolean isAtPosition(double target) {
+        return Math.abs(getUpdownPosition() - target) < Constants.kupdownTolerance;
+    }
 
+    public void intake() {
+        if (!isAtPosition(Constants.kintakeDownPosition)) {
+            updownMotor.setControl(updownVoltage.withPosition(Constants.kintakeDownPosition));
+            feedMotor.setControl(intakeVoltage.withVelocity(Constants.kfeedVelocity));
+        }
+    }
 
-
-
-
+  public Command intakeCommand() {
+    return run(
+        () -> {
+          intake();
+        });
+  }
 }

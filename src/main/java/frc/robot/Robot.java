@@ -190,7 +190,8 @@ public class Robot extends TimedRobot {
 
     _driverController
         .rightTrigger()
-        .whileTrue(m_intakeSubsystem.intakeCommand(((SwerveConstants.driverTranslationalVelocity.in(MetersPerSecond))*((SwerveConstants.driverAngularVelocity.in(RadiansPerSecond)))/(360/Math.PI)) * 2));
+        .whileTrue(
+            m_intakeSubsystem.intakeCommand());
   }
 
   /**
