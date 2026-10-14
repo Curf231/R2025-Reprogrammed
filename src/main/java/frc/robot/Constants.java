@@ -43,18 +43,18 @@ public final class Constants {
 
   public static class MotorConstants {
     // Intake motors (current ids should be replaced)
-    public static final int kfeedMotor = 0;
-    public static final int kupdownMotor = 1;
+    public static final int kfeedMotor = 15;
+    public static final int kupdownMotor = 8;
 
     
   }
 
   /* a few intake constants */
-  public static final double kintakeDownPosition = 5.0; // arbitrary values, should be replaced
+  public static final double kintakeDownPosition = .38; // further testing required
   public static final double kintakeUpPosition = 0.0;
-  public static final double kupdownTolerance = 0.1;
+  public static final double kupdownTolerance = 0.005;
 
-  public static final double kfeedVelocity = ((SwerveConstants.driverTranslationalVelocity.in(MetersPerSecond)) * ((SwerveConstants.driverAngularVelocity.in(RadiansPerSecond))) / (360 / Math.PI))* 2;
+  public static final double kfeedVelocity = 8; //rps
 
   public static class Gains {
     // Intake (arbitrary values)

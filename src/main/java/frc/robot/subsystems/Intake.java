@@ -7,6 +7,7 @@ import com.ctre.phoenix6.configs.MotionMagicConfigs;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.controls.MotionMagicVelocityVoltage;
 import com.ctre.phoenix6.controls.MotionMagicVoltage;
+import com.ctre.phoenix6.controls.VelocityVoltage;
 import com.ctre.phoenix6.controls.VoltageOut;
 import com.ctre.phoenix6.hardware.TalonFX;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -14,13 +15,16 @@ import edu.wpi.first.wpilibj2.command.Subsystem;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.robot.Constants;
 
-public class Intake implements Subsystem {
+public class Intake implements Subsystem {  // Use AdvancededSubsystem instead of Subsystem
 
   private final TalonFX feedMotor = new TalonFX(Constants.MotorConstants.kfeedMotor);
-  private final TalonFX updownMotor = new TalonFX(Constants.MotorConstants.kupdownMotor);
+  private final TalonFX updownMotor = new TalonFX(Constants.MotorConstants.kupdownMotor); //rename it to actutator motor
 
-  private final MotionMagicVelocityVoltage intakeVoltage = new MotionMagicVelocityVoltage(0);
-  private final MotionMagicVoltage updownVoltage = new MotionMagicVoltage(0);
+  private final VelocityVoltage intakeVoltageSetter = new VelocityVoltage(0); //use VelocityVoltage for the rollers
+  private final MotionMagicVoltage updownVoltageSetter = new MotionMagicVoltage(0);
+
+  private final double updownPositionGetter = updownMotor.getPosition().getValueAsDouble();
+
 
   private final VoltageOut sysIdVoltage = new VoltageOut(0);
 
@@ -57,7 +61,6 @@ public class Intake implements Subsystem {
   public Intake() {
 
     feedMotor.getConfigurator().apply(Constants.Gains.kfeedGains);
-    feedMotor.getConfigurator().apply(Constants.Gains.kmotionMagicFeedConfig);
 
     updownMotor.getConfigurator().apply(Constants.Gains.kupdownGains);
     updownMotor.getConfigurator().apply(Constants.Gains.kmotionMagicUpdownConfig);
@@ -75,8 +78,8 @@ public class Intake implements Subsystem {
 
     public void intake() {
         if (!isAtPosition(Constants.kintakeDownPosition)) {
-            updownMotor.setControl(updownVoltage.withPosition(Constants.kintakeDownPosition));
-            feedMotor.setControl(intakeVoltage.withVelocity(Constants.kfeedVelocity));
+            updownMotor.setControl(updownVoltageSetter.withPosition(Constants.kintakeDownPosition));
+            feedMotor.setControl(intakeVoltageSetter.withVelocity(Constants.kfeedVelocity));
         }
     }
 
