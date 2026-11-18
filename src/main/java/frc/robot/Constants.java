@@ -8,7 +8,6 @@ import static edu.wpi.first.units.Units.*;
 
 import com.ctre.phoenix6.configs.MotionMagicConfigs;
 import com.ctre.phoenix6.configs.SlotConfigs;
-
 import edu.wpi.first.apriltag.AprilTagFieldLayout;
 import edu.wpi.first.apriltag.AprilTagFields;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -41,41 +40,38 @@ public final class Constants {
     public static final int driverController = 0;
   }
 
-  public static class MotorConstants {
+  public static class IntakeConstants {
     // Intake motors (current ids should be replaced)
     public static final int kfeedMotor = 15;
-    public static final int kupdownMotor = 8;
-
-    
+    public static final int kpivotMotor = 8;
   }
 
   /* a few intake constants */
   public static final double kintakeDownPosition = .38; // further testing required
   public static final double kintakeUpPosition = 0.0;
-  public static final double kupdownTolerance = 0.005;
+  public static final double kpivotTolerance = 0.005;
 
-  public static final double kfeedVelocity = 8; //rps
+  public static final double kfeedVelocity = 8; // rps
 
   public static class Gains {
     // Intake (arbitrary values)
     public static final SlotConfigs kfeedGains =
         new SlotConfigs().withKP(0.1).withKI(0).withKD(0).withKS(0);
 
-    public static final MotionMagicConfigs kmotionMagicFeedConfig = 
+    public static final MotionMagicConfigs kmotionMagicFeedConfig =
         new MotionMagicConfigs()
-          .withMotionMagicCruiseVelocity(80)
-          .withMotionMagicAcceleration(160)
-          .withMotionMagicJerk(1600);
+            .withMotionMagicCruiseVelocity(80)
+            .withMotionMagicAcceleration(160)
+            .withMotionMagicJerk(1600);
 
-
-    public static final SlotConfigs kupdownGains =
+    public static final SlotConfigs kpivotGains =
         new SlotConfigs().withKP(0.1).withKI(0).withKD(0).withKS(0).withKG(0);
 
-    public static final MotionMagicConfigs kmotionMagicUpdownConfig = 
+    public static final MotionMagicConfigs kmotionMagicPivotConfig =
         new MotionMagicConfigs()
-          .withMotionMagicCruiseVelocity(80)
-          .withMotionMagicAcceleration(160)
-          .withMotionMagicJerk(1600);
+            .withMotionMagicCruiseVelocity(80)
+            .withMotionMagicAcceleration(160)
+            .withMotionMagicJerk(1600);
   }
 
   public static class FieldConstants {
@@ -134,5 +130,19 @@ public final class Constants {
 
     public static LinearVelocity translationalDeadband = MetersPerSecond.of(0.01);
     public static AngularVelocity rotationalDeadband = RadiansPerSecond.of(0.01);
+
+    public static class ManipulatorCoinstants {
+
+      public static final int _leftAlgaeMotorID = 0;
+      public static final int _rightAlgaeMotor = 0;
+
+      public static final int _algeaBeambrakeID = 0;
+      public static final int _coralBeambrake = 0;
+    }
+    
+    public static class SerializerConstants {
+      public static final int _serializerMotorID = 0;
+      public static final int _serializerBeamBreak = 0;
+    }
   }
 }

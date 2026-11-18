@@ -32,7 +32,7 @@ public abstract class AdvancedSubsystem extends SubsystemBase
 
   /**
    * Returns the name of the command that's currently requiring this subsystem. Is "None" when the
-   * command is null.
+   * command in null.
    */
   public final String currentCommandName() {
     if (getCurrentCommand() != null) {

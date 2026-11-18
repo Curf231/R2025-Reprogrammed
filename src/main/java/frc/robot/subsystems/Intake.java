@@ -3,9 +3,6 @@ package frc.robot.subsystems;
 import static edu.wpi.first.units.Units.*;
 
 import com.ctre.phoenix6.SignalLogger;
-import com.ctre.phoenix6.configs.MotionMagicConfigs;
-import com.ctre.phoenix6.configs.TalonFXConfiguration;
-import com.ctre.phoenix6.controls.MotionMagicVelocityVoltage;
 import com.ctre.phoenix6.controls.MotionMagicVoltage;
 import com.ctre.phoenix6.controls.VelocityVoltage;
 import com.ctre.phoenix6.controls.VoltageOut;
@@ -13,18 +10,20 @@ import com.ctre.phoenix6.hardware.TalonFX;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Subsystem;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
+import frc.lib.AdvancedSubsystem;
 import frc.robot.Constants;
 
-public class Intake implements Subsystem {  // Use AdvancededSubsystem instead of Subsystem
+public class Intake extends AdvancedSubsystem {
 
-  private final TalonFX feedMotor = new TalonFX(Constants.MotorConstants.kfeedMotor);
-  private final TalonFX updownMotor = new TalonFX(Constants.MotorConstants.kupdownMotor); //rename it to actutator motor
+  private final TalonFX feedMotor = new TalonFX(Constants.IntakeConstants.kfeedMotor);
+  private final TalonFX pivotMotor =
+      new TalonFX(Constants.IntakeConstants.kpivotMotor); // rename it to actutator motor
 
-  private final VelocityVoltage intakeVoltageSetter = new VelocityVoltage(0); //use VelocityVoltage for the rollers
-  private final MotionMagicVoltage updownVoltageSetter = new MotionMagicVoltage(0);
+  private final VelocityVoltage intakeVoltageSetter =
+      new VelocityVoltage(0); // use VelocityVoltage for the rollers
+  private final MotionMagicVoltage pivotVoltageSetter = new MotionMagicVoltage(0);
 
-  private final double updownPositionGetter = updownMotor.getPosition().getValueAsDouble();
-
+  private final double pivotPositionGetter = pivotMotor.getPosition().getValueAsDouble();
 
   private final VoltageOut sysIdVoltage = new VoltageOut(0);
 
@@ -37,13 +36,11 @@ public class Intake implements Subsystem {  // Use AdvancededSubsystem instead o
               // Log state with SignalLogger class
               state -> SignalLogger.writeString("state", state.toString())),
           new SysIdRoutine.Mechanism(
-              output -> feedMotor.setControl(sysIdVoltage.withOutput(output.in(Volts))), 
-              null, 
-              this
-            )
-        );
+              output -> feedMotor.setControl(sysIdVoltage.withOutput(output.in(Volts))),
+              null,
+              this));
 
-    private final SysIdRoutine _updownRoutine =
+  private final SysIdRoutine _pivotRoutine =
       new SysIdRoutine(
           new SysIdRoutine.Config(
               null, // Use default ramp rate (1 V/s)
@@ -52,36 +49,34 @@ public class Intake implements Subsystem {  // Use AdvancededSubsystem instead o
               // Log state with SignalLogger class
               state -> SignalLogger.writeString("state", state.toString())),
           new SysIdRoutine.Mechanism(
-              output -> updownMotor.setControl(sysIdVoltage.withOutput(output.in(Volts))), 
-              null, 
-              this
-            )
-        );
+              output -> pivotMotor.setControl(sysIdVoltage.withOutput(output.in(Volts))),
+              null,
+              this));
 
   public Intake() {
 
     feedMotor.getConfigurator().apply(Constants.Gains.kfeedGains);
 
-    updownMotor.getConfigurator().apply(Constants.Gains.kupdownGains);
-    updownMotor.getConfigurator().apply(Constants.Gains.kmotionMagicUpdownConfig);
+    pivotMotor.getConfigurator().apply(Constants.Gains.kpivotGains);
+    pivotMotor.getConfigurator().apply(Constants.Gains.kmotionMagicPivotConfig);
 
-    updownMotor.setPosition(0);
+    pivotMotor.setPosition(0);
   }
 
-    public double getUpdownPosition() {
-        return updownMotor.getPosition().getValueAsDouble(); // rotations
-    }
+  public double getPivotPosition() {
+    return pivotMotor.getPosition().getValueAsDouble(); // rotations
+  }
 
-    public boolean isAtPosition(double target) {
-        return Math.abs(getUpdownPosition() - target) < Constants.kupdownTolerance;
-    }
+  public boolean isAtPosition(double target) {
+    return Math.abs(getPivotPosition() - target) < Constants.kpivotTolerance;
+  }
 
-    public void intake() {
-        if (!isAtPosition(Constants.kintakeDownPosition)) {
-            updownMotor.setControl(updownVoltageSetter.withPosition(Constants.kintakeDownPosition));
-            feedMotor.setControl(intakeVoltageSetter.withVelocity(Constants.kfeedVelocity));
-        }
+  public void intake() {
+    if (!isAtPosition(Constants.kintakeDownPosition)) {
+      pivotMotor.setControl(pivotVoltageSetter.withPosition(Constants.kintakeDownPosition));
+      feedMotor.setControl(intakeVoltageSetter.withVelocity(Constants.kfeedVelocity));
     }
+  }
 
   public Command intakeCommand() {
     return run(
