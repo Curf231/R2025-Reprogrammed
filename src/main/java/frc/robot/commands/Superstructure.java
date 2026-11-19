@@ -12,4 +12,7 @@ public class Superstructure {
   private Superstructure() {
     throw new UnsupportedOperationException("This is a utility class!");
   }
+
+
+  // command that intakes and serializes while coral beam is true
 }

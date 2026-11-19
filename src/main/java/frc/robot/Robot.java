@@ -49,6 +49,9 @@ public class Robot extends TimedRobot {
   private final CommandXboxController _driverController =
       new CommandXboxController(Ports.driverController);
 
+  private final CommandXboxController _operatorController =
+      new CommandXboxController(Ports.operatorController);
+
   // subsystems
   @Logged(name = "Swerve")
   private final Swerve _swerve = TunerConstants.createDrivetrain();
@@ -90,6 +93,7 @@ public class Robot extends TimedRobot {
     FaultLogger.setup(_ntInst);
 
     configureDriverBindings();
+    configureOperatorBindings();
 
     SmartDashboard.putData("Wheel Radius Characterization", _swerve.wheelRadiusCharacterization());
     SmartDashboard.putData("Calculate Wheel COF", _swerve.calculateWheelCOF());
@@ -187,8 +191,12 @@ public class Robot extends TimedRobot {
     _driverController.x().whileTrue(_swerve.brake());
     _driverController.a().onTrue(_swerve.toggleFieldOriented());
     _driverController.y().onTrue(_swerve.resetHeading());
+  }
 
-    _driverController.rightTrigger().whileTrue(m_intakeSubsystem.intakeCommand());
+  private void configureOperatorBindings() {
+      // intake
+      // eventually will be using superstructure, once serializer is complete
+      _operatorController.rightTrigger().whileTrue(m_intakeSubsystem.intakeCommand());
   }
 
   /**

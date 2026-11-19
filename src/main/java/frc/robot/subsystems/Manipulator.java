@@ -28,7 +28,7 @@ public class Manipulator extends AdvancedSubsystem {
   private final DigitalInput _algeaBeambrake = new DigitalInput(ManipulatorCoinstants._algeaBeambrakeID);
   private final DigitalInput _coralBeambrake = new DigitalInput(ManipulatorCoinstants._coralBeambrake);
 
-  private final BooleanEvent _coralSeen = new BooleanEvent(null, null);
+  private final BooleanEvent _coralSeen = new BooleanEvent(null, null); // second param should be this._coralBeambreak
   private final BooleanEvent _algeaSeen = new BooleanEvent(null, null);
 
   private final SysIdRoutine _LeftMotorRoutine =

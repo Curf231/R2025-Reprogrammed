@@ -38,20 +38,20 @@ public final class Constants {
 
   public static class Ports {
     public static final int driverController = 0;
+    public static final int operatorController = 1;
   }
 
   public static class IntakeConstants {
     // Intake motors (current ids should be replaced)
     public static final int kfeedMotor = 15;
     public static final int kpivotMotor = 8;
-  }
 
-  /* a few intake constants */
-  public static final double kintakeDownPosition = .38; // further testing required
-  public static final double kintakeUpPosition = 0.0;
-  public static final double kpivotTolerance = 0.005;
+    public static final double kintakeDownPosition = .38; // further testing required
+    public static final double kintakeUpPosition = 0.0;
+    public static final double kpivotTolerance = 0.005;
 
-  public static final double kfeedVelocity = 8; // rps
+    public static final double kfeedVelocity = 8; // rps
+  }  
 
   public static class Gains {
     // Intake (arbitrary values)

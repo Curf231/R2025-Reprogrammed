@@ -8,7 +8,6 @@ import com.ctre.phoenix6.controls.VelocityVoltage;
 import com.ctre.phoenix6.controls.VoltageOut;
 import com.ctre.phoenix6.hardware.TalonFX;
 import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.Subsystem;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.lib.AdvancedSubsystem;
 import frc.robot.Constants;
@@ -17,15 +16,18 @@ public class Intake extends AdvancedSubsystem {
 
   private final TalonFX feedMotor = new TalonFX(Constants.IntakeConstants.kfeedMotor);
   private final TalonFX pivotMotor =
-      new TalonFX(Constants.IntakeConstants.kpivotMotor); // rename it to actutator motor
+      new TalonFX(Constants.IntakeConstants.kpivotMotor);
 
   private final VelocityVoltage intakeVoltageSetter =
-      new VelocityVoltage(0); // use VelocityVoltage for the rollers
+      new VelocityVoltage(0);
   private final MotionMagicVoltage pivotVoltageSetter = new MotionMagicVoltage(0);
 
   private final double pivotPositionGetter = pivotMotor.getPosition().getValueAsDouble();
 
   private final VoltageOut sysIdVoltage = new VoltageOut(0);
+
+
+  // !!! RUN SYSID WHENEVER WE GET THE CHANCE !!!
 
   private final SysIdRoutine _feedRoutine =
       new SysIdRoutine(
@@ -68,14 +70,14 @@ public class Intake extends AdvancedSubsystem {
   }
 
   public boolean isAtPosition(double target) {
-    return Math.abs(getPivotPosition() - target) < Constants.kpivotTolerance;
+    return Math.abs(getPivotPosition() - target) < Constants.IntakeConstants.kpivotTolerance;
   }
 
   public void intake() {
-    if (!isAtPosition(Constants.kintakeDownPosition)) {
-      pivotMotor.setControl(pivotVoltageSetter.withPosition(Constants.kintakeDownPosition));
-      feedMotor.setControl(intakeVoltageSetter.withVelocity(Constants.kfeedVelocity));
+    if (!isAtPosition(Constants.IntakeConstants.kintakeDownPosition)) {
+      pivotMotor.setControl(pivotVoltageSetter.withPosition(Constants.IntakeConstants.kintakeDownPosition));
     }
+    feedMotor.setControl(intakeVoltageSetter.withVelocity(Constants.IntakeConstants.kfeedVelocity));
   }
 
   public Command intakeCommand() {
