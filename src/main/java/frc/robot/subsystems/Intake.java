@@ -3,10 +3,14 @@ package frc.robot.subsystems;
 import static edu.wpi.first.units.Units.*;
 
 import com.ctre.phoenix6.SignalLogger;
+import com.ctre.phoenix6.StatusSignal;
 import com.ctre.phoenix6.controls.MotionMagicVoltage;
 import com.ctre.phoenix6.controls.VelocityVoltage;
 import com.ctre.phoenix6.controls.VoltageOut;
 import com.ctre.phoenix6.hardware.TalonFX;
+
+import edu.wpi.first.units.measure.Angle;
+import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.lib.AdvancedSubsystem;
@@ -14,15 +18,20 @@ import frc.robot.Constants;
 
 public class Intake extends AdvancedSubsystem {
 
-  private final TalonFX feedMotor = new TalonFX(Constants.IntakeConstants.kfeedMotor);
+  private final TalonFX feedMotor =
+      new TalonFX(Constants.IntakeConstants.kfeedMotor);
   private final TalonFX pivotMotor =
       new TalonFX(Constants.IntakeConstants.kpivotMotor);
 
   private final VelocityVoltage intakeVoltageSetter =
       new VelocityVoltage(0);
-  private final MotionMagicVoltage pivotVoltageSetter = new MotionMagicVoltage(0);
+  private final MotionMagicVoltage pivotVoltageSetter =
+      new MotionMagicVoltage(0);
 
-  private final double pivotPositionGetter = pivotMotor.getPosition().getValueAsDouble();
+  private final StatusSignal<Angle> _pivotMotorGetter = pivotMotor.getPosition();
+  private final StatusSignal<AngularVelocity> _feedMotorGetter = feedMotor.getVelocity();
+
+  // private final double pivotPositionGetter = pivotMotor.getPosition().getValueAsDouble();
 
   private final VoltageOut sysIdVoltage = new VoltageOut(0);
 
@@ -66,7 +75,11 @@ public class Intake extends AdvancedSubsystem {
   }
 
   public double getPivotPosition() {
-    return pivotMotor.getPosition().getValueAsDouble(); // rotations
+    return _pivotMotorGetter.refresh().getValue().in(Radians); // rotations
+  }
+
+  public double getFeedVelocity() {
+    return _feedMotorGetter.refresh().getValue().in(RadiansPerSecond); // radians/sec
   }
 
   public boolean isAtPosition(double target) {
